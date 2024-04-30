@@ -1,0 +1,330 @@
+openapi: 3.1.0
+x-stoplight:
+  id: dswtgdda6fye1
+info:
+  title: Proxy API
+  version: '1.0'
+servers:
+  - url: 'http://localhost:3000'
+paths:
+  '/user/{userUuid}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+          minLength: 1
+        name: userUuid
+        in: path
+        required: true
+    get:
+      summary: Get User Info by User ID
+      tags: []
+      responses:
+        '200':
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                Example 1:
+                  value:
+                    id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                    firstName: string
+                    lastName: string
+                    email: user@example.com
+                    dateOfBirth: '1997-10-31'
+                    emailVerified: true
+                    createDate: '2019-08-24'
+        '404':
+          description: User Not Found
+      operationId: get-users-userId
+      description: Retrieve the information of the user with the matching user ID.
+  /workspace:
+    post:
+      summary: Create workspace
+      operationId: post-workspace
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+        '400':
+          description: Bad Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-stoplight:
+                    id: qaezbu95ewyf6
+                '':
+                  type: string
+                  x-stoplight:
+                    id: j6wz9ceqwxp4c
+  '/workspace/{uuid}':
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+          minLength: 1
+        name: uuid
+        in: path
+        required: true
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workspace'
+        '404':
+          description: Not Found
+      operationId: get-workspace-uuid
+  '/canvas/{uuid}':
+    get:
+      summary: Your GET endpoint
+      tags: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Canvas'
+              examples:
+                Example 1:
+                  value:
+                    id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                    name: string
+                    dateCreated: string
+                    lastUpdated: '2019-08-24T14:15:22Z'
+                    deleted: false
+        '404':
+          description: Not Found
+      operationId: get-canvas
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+          minLength: 1
+        name: uuid
+        in: path
+        required: true
+  /canvas:
+    post:
+      summary: Create canvas for given workspace
+      operationId: post-canvas
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Canvas'
+              examples:
+                Example 1:
+                  value:
+                    id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                    name: string
+                    dateCreated: string
+                    lastUpdated: '2019-08-24T14:15:22Z'
+                    deleted: false
+        '400':
+          description: Bad Request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  x-stoplight:
+                    id: zkpjpyk9rj2wg
+                workspaceId:
+                  x-stoplight:
+                    id: gd9f6plqx5yh7
+                  type: string
+                  format: uuid
+                  minLength: 1
+                  description: uuid for workspace
+              required:
+                - name
+                - workspaceId
+            examples:
+              Example 1:
+                value:
+                  name: string
+                  workspaceId: ef0efa32-d1c1-43d4-a5e2-fe7b4f00403c
+    patch:
+      summary: Update canvas state
+      operationId: patch-canvas
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    x-stoplight:
+                      id: fyj4bqtdwr7ka
+                    format: uuid
+                  lastUpdated:
+                    type: string
+                    x-stoplight:
+                      id: o5tyhi2nwpjly
+                    format: date-time
+                required:
+                  - id
+                  - lastUpdated
+              examples:
+                Example 1:
+                  value:
+                    id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                    lastUpdated: '2019-08-24T14:15:22Z'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+      description: Main endpoint used to update canvas state
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  x-stoplight:
+                    id: j0m07elqkdh99
+                  format: uuid
+                appState:
+                  type: object
+                  x-stoplight:
+                    id: rdopbjkrrwaez
+                files:
+                  type: object
+                  x-stoplight:
+                    id: qqanayzq10d79
+                excalidrawElements:
+                  type: object
+                  x-stoplight:
+                    id: 8wkid1ibzegkw
+              required:
+                - id
+            examples:
+              Example 1:
+                value:
+                  id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                  appState: {}
+                  files: {}
+                  excalidrawElements: {}
+    parameters: []
+components:
+  schemas:
+    User:
+      title: User
+      type: object
+      examples: []
+      x-stoplight:
+        id: k83e6rke9t40v
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the given user.
+          format: uuid
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        dateOfBirth:
+          type: string
+          format: date
+          example: '1997-10-31'
+        emailVerified:
+          type: boolean
+          description: Set to true if the user's email has been verified.
+        createDate:
+          type: string
+          format: date
+          description: The date that the user was created.
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - emailVerified
+    Workspace:
+      title: Workspace
+      x-stoplight:
+        id: te8nbc9znesun
+      type: object
+      examples:
+        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+          name: DAO App
+          dateCreated: '2024-04-01 15:01:00:1234'
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          x-stoplight:
+            id: pl3f85ut20jb8
+        dateCreated:
+          type: string
+          x-stoplight:
+            id: qcnsgpy7xvkiq
+        lastUpdated:
+          type: string
+          x-stoplight:
+            id: jhrnnkltme3o8
+          format: date-time
+        deleted:
+          type: boolean
+          x-stoplight:
+            id: pfnl8fxwcwju7
+    Canvas:
+      title: Canvas
+      x-stoplight:
+        id: sy9cjgbskwxoy
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          x-stoplight:
+            id: yb2xb3hcfybh8
+        dateCreated:
+          type: string
+          x-stoplight:
+            id: 7bgay5wds2v6o
+        lastUpdated:
+          type: string
+          x-stoplight:
+            id: 15sv1mmqphs1d
+          format: date-time
+        deleted:
+          type: boolean
+          x-stoplight:
+            id: jo0d4zbnodkkp
+          default: false
+      required:
+        - id
