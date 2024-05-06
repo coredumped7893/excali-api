@@ -8,7 +8,6 @@ import {
   CanvasMetadataUpdateCommand,
   CanvasStateFilter,
 } from './canvas.interface';
-import { WorkspaceEntity } from '../workspace/entity/workspace.entity';
 import { CanvasStateEntity } from './entity/canvas-state.entity';
 import { Uuid } from '../common/common.interface';
 import {
@@ -24,26 +23,14 @@ export class CanvasService {
     private readonly canvasStateRepository: Repository<CanvasStateEntity>,
     @InjectRepository(CanvasEntity)
     private readonly canvasRepository: Repository<CanvasEntity>,
-    @InjectRepository(WorkspaceEntity)
-    private readonly workspaceRepository: Repository<WorkspaceEntity>,
   ) {}
 
   /**
    * Create new canvas
    */
   public async create(command: CanvasCreateCommand): Promise<CanvasEntity> {
-    const workspace = await this.workspaceRepository.findOneBy({
-      id: command.workspaceId,
-    });
-
-    if (!workspace) {
-      throw new NotFoundException();
-    }
-
-    //@TODO refactor to use `.create();`
     const canvas = new CanvasEntity();
     canvas.name = command.name;
-    canvas.workspace = new WorkspaceEntity(command.workspaceId);
     await this.canvasRepository.save(canvas);
     return canvas;
   }
@@ -75,33 +62,38 @@ export class CanvasService {
     command: CanvasMetadataUpdateCommand,
   ): Promise<CanvasEntity> {
     const canvas = await this.canvasRepository.findOneBy({ id: command.id });
-    const workspace = await this.workspaceRepository.findOneBy({
-      id: command.workspaceId,
-    });
 
-    if (!canvas || !workspace) {
+    if (!canvas) {
       throw new NotFoundException();
     }
 
     canvas.name = command.name;
-    canvas.workspace = new WorkspaceEntity(command.workspaceId);
-
     await this.canvasRepository.save(canvas);
 
     return canvas;
   }
 
   public async readById(id: Uuid): Promise<CanvasEntity> {
-    return this.canvasRepository.findOneBy({ id });
+    return this.canvasRepository.findOne({
+      where: {
+        id,
+      },
+      relations: {
+        tags: true,
+      },
+    });
   }
 
   public async readAll(filter: ListFilter): Promise<PagedResult<CanvasEntity>> {
     const qb = PageableUtils.producePagedQueryBuilder(
       filter,
-      this.canvasRepository.createQueryBuilder(),
+      this.canvasRepository.createQueryBuilder('canvas'),
     );
 
-    return PageableUtils.producePagedResult(filter, await qb.getManyAndCount());
+    return PageableUtils.producePagedResult(
+      filter,
+      await qb.leftJoinAndSelect('canvas.tags', 'tags').getManyAndCount(),
+    );
   }
 
   private produceEmptyCanvasState(canvasId?: Uuid): Partial<CanvasStateEntity> {

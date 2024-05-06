@@ -1,14 +1,14 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { WorkspaceEntity } from './workspace.entity';
 import { UserEntity } from '../../user/entity/user.entity';
+import { CanvasEntity } from './canvas.entity';
 
-@Entity('workspace_access')
-export class WorkspaceAccessEntity {
+@Entity('canvas_access')
+export class CanvasAccessEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => WorkspaceEntity, { nullable: false })
-  workspace: WorkspaceEntity;
+  @ManyToOne(() => CanvasEntity, { nullable: false })
+  canvas: CanvasEntity;
 
   @ManyToOne(() => UserEntity, { nullable: false })
   user: UserEntity;

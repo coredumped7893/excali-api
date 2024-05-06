@@ -1,12 +1,11 @@
 import {
   Column,
   Entity,
-  ManyToOne,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
-  RelationId,
 } from 'typeorm';
-import { WorkspaceEntity } from '../../workspace/entity/workspace.entity';
-import { Uuid } from '../../common/common.interface';
+import { CanvasTagEntity } from './canvas-tag.entity';
 
 @Entity('canvas')
 export class CanvasEntity {
@@ -22,9 +21,9 @@ export class CanvasEntity {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   dateUpdated: Date;
 
-  @ManyToOne(() => WorkspaceEntity, { nullable: false })
-  workspace: WorkspaceEntity;
-
-  @RelationId((canvas: CanvasEntity) => canvas.workspace)
-  workspaceId: Uuid;
+  @ManyToMany(() => CanvasTagEntity)
+  @JoinTable({
+    name: 'canvas_tags',
+  })
+  tags: CanvasTagEntity[];
 }
