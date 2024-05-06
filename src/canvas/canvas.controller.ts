@@ -19,6 +19,7 @@ import {
 import { Uuid } from '../common/common.interface';
 import { ListFilter } from '../common/pageable.utils';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
+import { Log } from '@algoan/nestjs-logging-interceptor';
 
 @Controller('/canvas')
 export class CanvasController {
@@ -34,7 +35,6 @@ export class CanvasController {
    * Example input:
    * ```json
    * {
-   * "workspaceId":"bbe58d3e-3f17-4108-bb85-579e2ce3b1b3",
    * "name":"Canvas1"
    * }
    * ```
@@ -44,7 +44,6 @@ export class CanvasController {
    * {
    *     "id": "2a204754-603d-47b5-a217-5622bf8432b1",
    *     "name": "Canvas1",
-   *     "workspaceId": "bbe58d3e-3f17-4108-bb85-579e2ce3b1b3"
    * }
    * ```
    *
@@ -58,7 +57,7 @@ export class CanvasController {
     return {
       id: canvas.id,
       name: canvas.name,
-      workspaceId: canvas.workspace.id,
+      tags: canvas.tags,
       dateCreated: canvas.dateCreated,
       dateUpdated: canvas.dateUpdated,
     };
@@ -71,7 +70,6 @@ export class CanvasController {
    * Example body:
    * ```json
    * {
-   *     "workspaceId": "ff32d967-844e-4d89-a832-ed73302e31a3",
    *     "name": "New name example"
    * }
    * ```
@@ -81,7 +79,6 @@ export class CanvasController {
    * {
    *     "id": "412f90c4-55d4-4a01-8dc0-2cd16edcc1ef",
    *     "name": "New name example",
-   *     "workspaceId": "ff32d967-844e-4d89-a832-ed73302e31a3"
    * }
    * ```
    *
@@ -103,7 +100,7 @@ export class CanvasController {
     return {
       id: canvas.id,
       name: canvas.name,
-      workspaceId: canvas.workspace.id,
+      tags: canvas.tags,
       dateCreated: canvas.dateCreated,
       dateUpdated: canvas.dateUpdated,
     };
@@ -136,7 +133,6 @@ export class CanvasController {
    * {
    *     "id": "e28d9f95-487c-4c32-ad88-c0437c8fdb13",
    *     "name": "Canvas1",
-   *     "workspaceId": "bbe58d3e-3f17-4108-bb85-579e2ce3b1b3"
    * }
    * ```
    *
@@ -157,12 +153,17 @@ export class CanvasController {
     return {
       id: canvas.id,
       name: canvas.name,
-      workspaceId: canvas.workspaceId,
+      tags: canvas.tags,
       dateCreated: canvas.dateCreated,
       dateUpdated: canvas.dateUpdated,
     };
   }
 
+  @Log({
+    mask: {
+      response: ['appState', 'elements', 'files'],
+    },
+  })
   @Get('/state')
   public async readState(@Query() filter: CanvasStateFilter) {
     return this.canvasService.readState(filter);
@@ -178,7 +179,6 @@ export class CanvasController {
    *     "name": "Canvas1",
    *     "dateCreated": "2024-04-19T16:56:02.442Z",
    *     "dateUpdated": "2024-04-19T16:56:02.442Z",
-   *     "workspaceId": "bbe58d3e-3f17-4108-bb85-579e2ce3b1b3"
    * }
    * ```
    *
@@ -215,7 +215,6 @@ export class CanvasController {
    *             "name": "Canvas1",
    *             "dateCreated": "2024-04-19T16:56:02.442Z",
    *             "dateUpdated": "2024-04-19T16:56:02.442Z",
-   *             "workspaceId": "bbe58d3e-3f17-4108-bb85-579e2ce3b1b3"
    *         }
    *     ]
    * }

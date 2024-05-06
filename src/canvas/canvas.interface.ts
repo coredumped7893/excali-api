@@ -13,7 +13,6 @@ import {
 } from 'class-validator';
 
 export interface CanvasCreateCommand {
-  workspaceId: Uuid;
   name: string;
 }
 
@@ -26,19 +25,16 @@ export interface CanvasContentUpdateCommand {
 
 export interface CanvasMetadataUpdateCommand {
   id: Uuid;
-  workspaceId: Uuid;
   name: string;
 }
 
 export class CanvasMetadataUpdateDTO {
-  workspaceId: Uuid;
   @MinLength(3)
   @MaxLength(255)
   name: string;
 }
 
 export class CanvasCreateDTO {
-  workspaceId: Uuid;
   @MinLength(3)
   @MaxLength(255)
   name: string;
@@ -52,10 +48,16 @@ export interface CanvasContentUpdateDto {
 
 export interface CanvasDTO {
   id: Uuid;
-  workspaceId: Uuid;
   dateCreated: Date;
   dateUpdated: Date;
   name: string;
+  tags: CanvasTagDTO[];
+}
+
+export interface CanvasTagDTO {
+  id: Uuid;
+  name: string;
+  color: string;
 }
 
 export class CanvasStateFilter {

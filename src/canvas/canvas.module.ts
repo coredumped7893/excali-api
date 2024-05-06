@@ -2,16 +2,18 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CanvasEntity } from './entity/canvas.entity';
 import { CanvasController } from './canvas.controller';
-import { WorkspaceEntity } from '../workspace/entity/workspace.entity';
 import { CanvasService } from './canvas.service';
 import { CanvasStateEntity } from './entity/canvas-state.entity';
+import { CanvasTagEntity } from './entity/canvas-tag.entity';
+import { CanvasAccessEntity } from './entity/canvas-access.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       CanvasEntity,
-      WorkspaceEntity,
+      CanvasTagEntity,
       CanvasStateEntity,
+      CanvasAccessEntity,
     ]),
   ],
   controllers: [CanvasController],
