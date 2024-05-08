@@ -48,7 +48,8 @@ RUN pnpm run build
 ENV NODE_ENV production
 
 # Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
-RUN pnpm i --only=production && pnpm store prune
+RUN pnpm i --only=production
+RUN pnpm store prune
 
 USER node
 
