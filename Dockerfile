@@ -12,7 +12,7 @@ WORKDIR /usr/src/app
 # Copying this first prevents re-running npm install on every code change.
 COPY --chown=node:node package*.json ./
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@8
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
 RUN pnpm i
@@ -39,7 +39,7 @@ COPY --chown=node:node --from=development /usr/src/app/node_modules ./node_modul
 
 COPY --chown=node:node . .
 
-RUN npm install -g pnpm
+RUN npm install -g pnpm@8
 
 # Run the build command which creates the production bundle
 RUN pnpm run build
@@ -48,8 +48,7 @@ RUN pnpm run build
 ENV NODE_ENV production
 
 # Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
-RUN pnpm i --only=production
-RUN pnpm store prune
+RUN pnpm config set store-dir ~/pnpm && pnpm i --only=production && pnpm store prune
 
 USER node
 
