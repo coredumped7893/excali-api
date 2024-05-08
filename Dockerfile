@@ -16,6 +16,7 @@ RUN npm install -g pnpm
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
 RUN pnpm i
+RUN pnpm install express
 
 # Bundle app source
 COPY --chown=node:node . .
