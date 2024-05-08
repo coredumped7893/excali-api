@@ -1,17 +1,40 @@
 version: "3.8"
 services:
-#  web:
-#    build: .
-#    depends_on:
-#      db:
-#        condition: service_started
-#    ports:
-#      - "3000:3000"
+  web:
+    # build: .
+    image: excali:latest
+    depends_on:
+      db:
+        # condition: service_started
+        condition: service_healthy
+    # env_file: .env
+    environment:
+      - DATABASE_PORT=5432
+      - DATABASE_HOST=db
+      - DATABASE_USERNAME=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_NAME=postgres
+      - CLIENT_ID='...apps.googleusercontent.com'
+      - CLIENT_SECRET='...'
+      - CALL_BACK_URL='http://localhost:3000/api/auth/google/redirect'
+      - FRONT_APP_REDIRECT_URL='http://localhost:5173'
+      - CORS_ORIGIN='*'
+      - AUTH_GUARD_DISABLE=false
+      - AUTH_DEFAULT_USER_ID=''
+    ports:
+      - "3000:3000"
   db:
     image: "postgres:15-alpine"
+    # env_file: .env
     environment:
-      - POSTGRES_USER=excali_studio
-      - POSTGRES_PASSWORD=excali_studio
-      - POSTGRES_DB=excali_studio
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
+    healthcheck:
+      # test: "pg_isready --username=${POSTGRES_USER} && psql --username=${POSTGRES_USER} --list"
+      test: "pg_isready --username=postgres && psql --username=postgres --list"
+      interval: 5s
+      timeout: 10s
+      retries: 10

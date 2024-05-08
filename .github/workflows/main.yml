@@ -1,0 +1,42 @@
+name: Docker Image and Deployment CI
+
+on:
+  workflow_dispatch: # możliwość ręcznego odpalania
+    inputs:
+      only_env:
+        description: "Only update .env"
+        type: boolean
+        required: false
+        default: false
+  push: # na push do maina
+    branches:
+      - main
+
+jobs:
+
+  build:
+    runs-on: self-hosted # alternatywnie podać dowolny z skonfigurowanych tagów jeśli jest kilka runnerów
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker image
+        if: inputs.only_env == false
+        run: docker build . --tag excali-dev:latest -f Dockerfile
+
+      - name: Generate env
+        working-directory: ${{ secrets.DESTINATION_PATH }}
+        run: |
+          cat > .env <<EOF
+          CLIENT_ID=${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+          CALL_BACK_URL=${{ secrets.CALL_BACK_URL }}
+          FRONT_APP_REDIRECT_URL=${{ secrets.FRONT_APP_REDIRECT_URL }}
+          CORS_ORIGIN=${{ secrets.CORS_ORIGIN }}
+          AUTH_GUARD_DISABLE=${{ secrets.AUTH_GUARD_DISABLE }}
+          AUTH_DEFAULT_USER_ID=${{ secrets.AUTH_DEFAULT_USER_ID }}
+          EOF
+
+      - name: Run Docker image
+        working-directory: ${{ secrets.DESTINATION_PATH }}
+        run: docker compose up -d
