@@ -22,7 +22,7 @@ jobs:
 
       - name: Build Docker image
         if: inputs.only_env == false
-        run: docker build . --tag excali-dev:latest -f Dockerfile
+        run: sudo docker build . --tag excali-dev:latest -f Dockerfile
 
       - name: Generate env
         working-directory: ${{ secrets.DESTINATION_PATH }}
