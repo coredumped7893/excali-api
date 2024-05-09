@@ -45,6 +45,11 @@ $ pnpm run test:cov
 3. http://localhost:3000/api/user/me
 
 
+## Swagger docs
+
+Docs available at: http://localhost:3000/api
+
+
 ![Entities](docs_static/db_entities.png)
 
 
