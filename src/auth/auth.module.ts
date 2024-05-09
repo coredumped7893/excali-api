@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { PassportModule } from '@nestjs/passport';
 import { SessionSerializer } from './serializer/session.serializer';
 import { UserEntity } from '../user/entity/user.entity';
+import { UserRoleEntity } from '../user/entity/user-role.entity';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { UserEntity } from '../user/entity/user.entity';
       isGlobal: true,
       envFilePath: '.env',
     }),
-    TypeOrmModule.forFeature([UserEntity]),
+    TypeOrmModule.forFeature([UserEntity, UserRoleEntity]),
   ],
   controllers: [AuthController],
   providers: [
