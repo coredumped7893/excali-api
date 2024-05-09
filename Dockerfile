@@ -16,7 +16,7 @@ RUN npm install -g pnpm@8
 
 # Install app dependencies using the `npm ci` command instead of `npm install`
 RUN pnpm i
-# RUN pnpm install express
+RUN pnpm install express
 
 # Bundle app source
 COPY --chown=node:node . .
@@ -48,7 +48,8 @@ RUN pnpm run build
 ENV NODE_ENV production
 
 # Running `npm ci` removes the existing node_modules directory and passing in --only=production ensures that only the production dependencies are installed. This ensures that the node_modules directory is as optimized as possible
-RUN pnpm config set store-dir ~/pnpm && pnpm i --only=production && pnpm store prune
+RUN pnpm i --only=production && pnpm store prune
+RUN pnpm i express
 
 USER node
 
