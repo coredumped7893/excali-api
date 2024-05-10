@@ -16,7 +16,7 @@ export class AuthService {
 
   async validateUser(email: string, displayName: string) {
     const user = await this.userRepo.findOne({ where: { email: email } });
-    if (!user?.isEnabled) {
+    if (user && !user.isEnabled) {
       return null;
     }
 
@@ -37,7 +37,7 @@ export class AuthService {
 
   async findUser(id: string) {
     const user = await this.userRepo.findOne({ where: { id } });
-    if (!user?.isEnabled) {
+    if (user && !user.isEnabled) {
       return null;
     }
     return user?.id || null;
