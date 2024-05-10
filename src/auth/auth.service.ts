@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserEntity } from '../user/entity/user.entity';
 import { UserRoleEntity } from '../user/entity/user-role.entity';
-import * as process from 'node:process';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -12,6 +12,7 @@ export class AuthService {
     private readonly userRepo: Repository<UserEntity>,
     @InjectRepository(UserRoleEntity)
     private readonly userRoleRepo: Repository<UserRoleEntity>,
+    private readonly configService: ConfigService,
   ) {}
 
   async validateUser(email: string, displayName: string) {
@@ -24,9 +25,20 @@ export class AuthService {
       return user;
     }
 
+    // Create new user only if from whitelisted domain
+    const emailDomain = email.split('@').pop();
+    if (
+      !this.configService
+        .get('AUTH_EMAIL_DOMAIN_WHITELIST')
+        .split(',')
+        .includes(emailDomain)
+    ) {
+      return null;
+    }
+
     //In case of DEFAULT_USER_ROLE is not set, user will be registered without any role
     const roles = await this.userRoleRepo.find({
-      where: { name: process.env.DEFAULT_USER_ROLE },
+      where: { name: this.configService.get('DEFAULT_USER_ROLE') },
     });
 
     //Register anyone on their first sign-in
