@@ -6,6 +6,7 @@ import { CanvasService } from './canvas.service';
 import { CanvasStateEntity } from './entity/canvas-state.entity';
 import { CanvasTagEntity } from './entity/canvas-tag.entity';
 import { CanvasAccessEntity } from './entity/canvas-access.entity';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CanvasAccessEntity } from './entity/canvas-access.entity';
       CanvasTagEntity,
       CanvasStateEntity,
       CanvasAccessEntity,
+      UserEntity,
     ]),
   ],
   controllers: [CanvasController],

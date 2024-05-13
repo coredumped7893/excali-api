@@ -15,6 +15,8 @@ import {
   PageableUtils,
   PagedResult,
 } from '../common/pageable.utils';
+import { CanvasAccessEntity } from './entity/canvas-access.entity';
+import { UserEntity } from '../user/entity/user.entity';
 
 @Injectable()
 export class CanvasService {
@@ -23,15 +25,27 @@ export class CanvasService {
     private readonly canvasStateRepository: Repository<CanvasStateEntity>,
     @InjectRepository(CanvasEntity)
     private readonly canvasRepository: Repository<CanvasEntity>,
+    @InjectRepository(CanvasAccessEntity)
+    private readonly canvasAccessRepository: Repository<CanvasAccessEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
   ) {}
 
   /**
    * Create new canvas
    */
   public async create(command: CanvasCreateCommand): Promise<CanvasEntity> {
+    const user = await this.userRepository.findOne({
+      where: { id: command.userId },
+    });
     const canvas = new CanvasEntity();
     canvas.name = command.name;
     await this.canvasRepository.save(canvas);
+    const canvasAccess = new CanvasAccessEntity();
+    canvasAccess.isOwner = true;
+    canvasAccess.canvas = canvas;
+    canvasAccess.user = user;
+    await this.canvasAccessRepository.save(canvasAccess);
     return canvas;
   }
 

@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CanvasService } from './canvas.service';
@@ -20,6 +21,7 @@ import { Uuid } from '../common/common.interface';
 import { ListFilter } from '../common/pageable.utils';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
+import { Request } from 'express';
 
 @Controller('/canvas')
 export class CanvasController {
@@ -30,6 +32,7 @@ export class CanvasController {
    *
    * @param {CanvasCreateDTO} createDto - The data transfer object containing the canvas details.
    *
+   * @param req - HTTP request object
    * @returns {Promise<CanvasDTO>} - The promise of a CanvasDTO object representing the created canvas.
    *
    * Example input:
@@ -52,8 +55,10 @@ export class CanvasController {
   @UseGuards(AuthenticatedGuard)
   public async createNewCanvas(
     @Body() createDto: CanvasCreateDTO,
+    @Req() req: Request,
   ): Promise<CanvasDTO> {
-    const canvas = await this.canvasService.create(createDto);
+    const userId = req.user.toString();
+    const canvas = await this.canvasService.create({ ...createDto, userId });
     return {
       id: canvas.id,
       name: canvas.name,

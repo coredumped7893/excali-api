@@ -14,6 +14,7 @@ import {
 
 export interface CanvasCreateCommand {
   name: string;
+  userId: Uuid;
 }
 
 export interface CanvasContentUpdateCommand {
