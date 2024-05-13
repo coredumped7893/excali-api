@@ -3,10 +3,11 @@ import { Repository } from 'typeorm';
 import { CanvasEntity } from './entity/canvas.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-  CanvasContentUpdateCommand,
-  CanvasCreateCommand,
-  CanvasMetadataUpdateCommand,
-  CanvasStateFilter,
+    CancelAccessCommand,
+    CanvasContentUpdateCommand,
+    CanvasCreateCommand,
+    CanvasMetadataUpdateCommand,
+    CanvasStateFilter, GiveAccessCommand,
 } from './canvas.interface';
 import { CanvasStateEntity } from './entity/canvas-state.entity';
 import { Uuid } from '../common/common.interface';
@@ -154,5 +155,32 @@ export class CanvasService {
       (await queryBuilder.getOne()) ||
       (this.produceEmptyCanvasState(filter.canvasId) as CanvasStateEntity) //If state is empty return default one
     );
+  }
+
+  public async giveAccess(command: GiveAccessCommand) {
+    const user = await this.userRepository.findOne({
+      where: { id: command.userId },
+    });
+    const canvas = await this.canvasRepository.findOne({
+      where: { id: command.canvasId },
+    });
+    let canvasAccess = await this.canvasAccessRepository.findOne({
+      where: { user: { id: command.userId }, canvas: { id: command.canvasId } },
+    });
+    if (canvasAccess) {
+      return;
+    }
+    canvasAccess = new CanvasAccessEntity();
+    canvasAccess.isOwner = false;
+    canvasAccess.canvas = canvas;
+    canvasAccess.user = user;
+    await this.canvasAccessRepository.save(canvasAccess);
+  }
+
+  public async cancelAccess(command: CancelAccessCommand) {
+    await this.canvasAccessRepository.delete({
+      user: { id: command.userId },
+      canvas: { id: command.canvasId },
+    });
   }
 }

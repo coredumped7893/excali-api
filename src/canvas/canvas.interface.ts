@@ -29,6 +29,16 @@ export interface CanvasMetadataUpdateCommand {
   name: string;
 }
 
+export interface GiveAccessCommand {
+  canvasId: Uuid;
+  userId: Uuid;
+}
+
+export interface CancelAccessCommand {
+  canvasId: Uuid;
+  userId: Uuid;
+}
+
 export class CanvasMetadataUpdateDTO {
   @MinLength(3)
   @MaxLength(255)
@@ -59,6 +69,10 @@ export interface CanvasTagDTO {
   id: Uuid;
   name: string;
   color: string;
+}
+
+export class CanvasAccessDTO {
+  userId: Uuid;
 }
 
 export class CanvasStateFilter {

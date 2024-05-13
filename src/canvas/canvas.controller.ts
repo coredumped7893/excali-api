@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -11,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { CanvasService } from './canvas.service';
 import {
+  CanvasAccessDTO,
   CanvasContentUpdateDto,
   CanvasCreateDTO,
   CanvasDTO,
@@ -236,6 +238,38 @@ export class CanvasController {
     @Query() filter: ListFilter,
     @Req() req: Request,
   ): Promise<any> {
-    return this.canvasService.readAll(filter, req.user.toString());
+    return await this.canvasService.readAll(filter, req.user.toString());
+  }
+
+  /**
+   * Gives access to a single canvas for a single user
+   * @param canvasId
+   * @param dto - an object containing 'userId'
+   */
+  @Post('/:id/access')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async giveAccess(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasAccessDTO,
+  ): Promise<any> {
+    const userId = dto.userId;
+    await this.canvasService.giveAccess({ canvasId, userId });
+    return [];
+  }
+
+  /**
+   * Removes access to a single canvas for a single user
+   * @param canvasId
+   * @param dto - an object containing 'userId'
+   */
+  @Delete('/:id/access')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async cancelAccess(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasAccessDTO,
+  ): Promise<any> {
+    const userId = dto.userId;
+    await this.canvasService.cancelAccess({ canvasId, userId });
+    return [];
   }
 }
