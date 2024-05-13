@@ -3,11 +3,12 @@ import { Repository } from 'typeorm';
 import { CanvasEntity } from './entity/canvas.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
-    CancelAccessCommand,
-    CanvasContentUpdateCommand,
-    CanvasCreateCommand,
-    CanvasMetadataUpdateCommand,
-    CanvasStateFilter, GiveAccessCommand,
+  CancelAccessCommand,
+  CanvasContentUpdateCommand,
+  CanvasCreateCommand,
+  CanvasMetadataUpdateCommand,
+  CanvasStateFilter,
+  GiveAccessCommand,
 } from './canvas.interface';
 import { CanvasStateEntity } from './entity/canvas-state.entity';
 import { Uuid } from '../common/common.interface';
