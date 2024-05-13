@@ -227,11 +227,15 @@ export class CanvasController {
    * ```
    *
    * @param {ListFilter} filter - The filter to apply when retrieving items.
+   * @param req - HTTP request object
    * @return {Promise<any>} - A Promise that resolves to the retrieved items.
    */
   @Get('/')
   @UseGuards(AuthenticatedGuard)
-  public async readAll(@Query() filter: ListFilter): Promise<any> {
-    return this.canvasService.readAll(filter);
+  public async readAll(
+    @Query() filter: ListFilter,
+    @Req() req: Request,
+  ): Promise<any> {
+    return this.canvasService.readAll(filter, req.user.toString());
   }
 }

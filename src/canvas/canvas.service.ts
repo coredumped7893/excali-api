@@ -98,11 +98,29 @@ export class CanvasService {
     });
   }
 
-  public async readAll(filter: ListFilter): Promise<PagedResult<CanvasEntity>> {
+  public async readAll(
+    filter: ListFilter,
+    userId: Uuid,
+  ): Promise<PagedResult<CanvasEntity>> {
+    const accessibleCanvases = (
+      await this.canvasAccessRepository.find({
+        relations: {
+          canvas: true,
+        },
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+      })
+    ).map((access) => access.canvas.id);
+
     const qb = PageableUtils.producePagedQueryBuilder(
       filter,
       this.canvasRepository.createQueryBuilder('canvas'),
     );
+
+    qb.whereInIds(accessibleCanvases);
 
     return PageableUtils.producePagedResult(
       filter,
