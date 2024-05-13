@@ -20,6 +20,7 @@ import {
 import { Uuid } from '../common/common.interface';
 import { ListFilter } from '../common/pageable.utils';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
+import { CanvasGuard } from './guard/canvas.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
 import { Request } from 'express';
 
@@ -92,7 +93,7 @@ export class CanvasController {
    * @returns {Promise<CanvasDTO>} - A promise that resolves to the updated canvas.
    */
   @Patch('/:id')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async updateCanvasMetadata(
     @Param('id') id: Uuid,
     @Body() updateDto: CanvasMetadataUpdateDTO,
@@ -146,7 +147,7 @@ export class CanvasController {
    * @returns A Promise that resolves to a CanvasDTO object representing the updated canvas.
    */
   @Post('/:id/state')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async appendCanvasState(
     @Param('id') id: Uuid,
     @Body() appendStateDto: CanvasContentUpdateDto,
@@ -191,9 +192,9 @@ export class CanvasController {
    * @param {string} uuid - The UUID of the canvas to be retrieved.
    * @returns {Promise<CanvasDTO>} - A Promise that resolves to the retrieved CanvasDTO object.
    */
-  @Get('/:uuid')
-  @UseGuards(AuthenticatedGuard)
-  public async readById(@Param('uuid') uuid: Uuid): Promise<CanvasDTO> {
+  @Get('/:id')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async readById(@Param('id') uuid: Uuid): Promise<CanvasDTO> {
     return await this.canvasService.readById(uuid);
   }
 
