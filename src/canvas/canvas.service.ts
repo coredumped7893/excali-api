@@ -140,12 +140,13 @@ export class CanvasService {
   }
 
   public async readState(
+    canvasId: Uuid,
     filter: CanvasStateFilter,
   ): Promise<CanvasStateEntity> {
     const queryBuilder = this.canvasStateRepository
       .createQueryBuilder()
       .addOrderBy('"dateCreated"', 'DESC');
-    queryBuilder.andWhere({ canvasId: filter.canvasId });
+    queryBuilder.andWhere({ canvasId: canvasId });
 
     //If no timestamp value in filter is provided, return latest version
     if (filter.versionTimestamp) {
@@ -154,7 +155,7 @@ export class CanvasService {
 
     return (
       (await queryBuilder.getOne()) ||
-      (this.produceEmptyCanvasState(filter.canvasId) as CanvasStateEntity) //If state is empty return default one
+      (this.produceEmptyCanvasState(canvasId) as CanvasStateEntity) //If state is empty return default one
     );
   }
 

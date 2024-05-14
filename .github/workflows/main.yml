@@ -36,6 +36,7 @@ jobs:
           AUTH_GUARD_DISABLE=${{ secrets.AUTH_GUARD_DISABLE }}
           AUTH_DEFAULT_USER_ID=${{ secrets.AUTH_DEFAULT_USER_ID }}
           DEFAULT_USER_ROLE=${{ secrets.DEFAULT_USER_ROLE }}
+          SHARED_TAG_NAME=${{ secrets.SHARED_TAG_NAME }}
           EOF
 
       - name: Run Docker image
