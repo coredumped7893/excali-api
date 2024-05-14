@@ -146,7 +146,7 @@ export class CanvasService {
     const queryBuilder = this.canvasStateRepository
       .createQueryBuilder()
       .addOrderBy('"dateCreated"', 'DESC');
-    queryBuilder.andWhere({ canvasId: canvasId });
+    queryBuilder.andWhere({ canvasId });
 
     //If no timestamp value in filter is provided, return latest version
     if (filter.versionTimestamp) {
