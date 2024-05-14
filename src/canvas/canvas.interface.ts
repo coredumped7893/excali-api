@@ -72,6 +72,8 @@ export interface CanvasTagDTO {
 }
 
 export class CanvasAccessDTO {
+  @IsUUID()
+  @IsNotEmpty()
   userId: Uuid;
 }
 

@@ -165,6 +165,9 @@ export class CanvasService {
     const canvas = await this.canvasRepository.findOne({
       where: { id: command.canvasId },
     });
+    if (!user || !canvas) {
+      throw new NotFoundException();
+    }
     let canvasAccess = await this.canvasAccessRepository.findOne({
       where: { user: { id: command.userId }, canvas: { id: command.canvasId } },
     });

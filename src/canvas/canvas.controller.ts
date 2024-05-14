@@ -251,10 +251,9 @@ export class CanvasController {
   public async giveAccess(
     @Param('id') canvasId: Uuid,
     @Body() dto: CanvasAccessDTO,
-  ): Promise<any> {
+  ) {
     const userId = dto.userId;
     await this.canvasService.giveAccess({ canvasId, userId });
-    return [];
   }
 
   /**
@@ -267,9 +266,8 @@ export class CanvasController {
   public async cancelAccess(
     @Param('id') canvasId: Uuid,
     @Body() dto: CanvasAccessDTO,
-  ): Promise<any> {
+  ) {
     const userId = dto.userId;
     await this.canvasService.cancelAccess({ canvasId, userId });
-    return [];
   }
 }
