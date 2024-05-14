@@ -84,3 +84,28 @@ export class CanvasStateFilter {
   @IsNotEmpty()
   canvasId: Uuid;
 }
+
+export interface CanvasTagCreateCommand {
+  name: string;
+  color?: string;
+}
+
+export interface CanvasTagUpdateCommand {
+  id: Uuid;
+  name: string;
+  color?: string;
+}
+
+export interface CanvasTagDeleteCommand {
+  id: Uuid;
+}
+
+export class CanvasTagCreateOrUpdateDTO {
+  @MinLength(3)
+  @MaxLength(12)
+  name: string;
+  @IsOptional()
+  @MinLength(7)
+  @MaxLength(7)
+  color?: string;
+}
