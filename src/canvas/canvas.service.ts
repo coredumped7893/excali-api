@@ -4,9 +4,11 @@ import { CanvasEntity } from './entity/canvas.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   CancelAccessCommand,
+  CanvasAddTagCommand,
   CanvasContentUpdateCommand,
   CanvasCreateCommand,
   CanvasMetadataUpdateCommand,
+  CanvasRemoveTagCommand,
   CanvasStateFilter,
   GiveAccessCommand,
 } from './canvas.interface';
@@ -19,6 +21,7 @@ import {
 } from '../common/pageable.utils';
 import { CanvasAccessEntity } from './entity/canvas-access.entity';
 import { UserEntity } from '../user/entity/user.entity';
+import { CanvasTagEntity } from './entity/canvas-tag.entity';
 
 @Injectable()
 export class CanvasService {
@@ -31,6 +34,8 @@ export class CanvasService {
     private readonly canvasAccessRepository: Repository<CanvasAccessEntity>,
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(CanvasTagEntity)
+    private readonly canvasTagRepository: Repository<CanvasTagEntity>,
   ) {}
 
   /**
@@ -186,5 +191,35 @@ export class CanvasService {
       user: { id: command.userId },
       canvas: { id: command.canvasId },
     });
+  }
+
+  public async addTag(command: CanvasAddTagCommand) {
+    const tag = await this.canvasTagRepository.findOne({
+      where: { id: command.tagId },
+    });
+    const canvas = await this.canvasRepository.findOne({
+      where: { id: command.canvasId },
+      relations: { tags: true },
+    });
+    if (!tag || !canvas) {
+      throw new NotFoundException();
+    }
+    if (canvas.tags.includes(tag)) {
+      return;
+    }
+    canvas.tags.push(tag);
+    await this.canvasRepository.save(canvas);
+  }
+
+  public async removeTag(command: CanvasRemoveTagCommand) {
+    const canvas = await this.canvasRepository.findOne({
+      where: { id: command.canvasId },
+      relations: { tags: true },
+    });
+    if (!canvas) {
+      throw new NotFoundException();
+    }
+    canvas.tags = canvas.tags.filter((tag) => tag.id == command.tagId);
+    await this.canvasRepository.save(canvas);
   }
 }

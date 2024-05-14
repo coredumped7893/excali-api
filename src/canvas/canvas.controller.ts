@@ -17,6 +17,7 @@ import {
   CanvasCreateDTO,
   CanvasDTO,
   CanvasMetadataUpdateDTO,
+  CanvasModifyTagDTO,
   CanvasStateFilter,
 } from './canvas.interface';
 import { Uuid } from '../common/common.interface';
@@ -269,5 +270,35 @@ export class CanvasController {
   ) {
     const userId = dto.userId;
     await this.canvasService.cancelAccess({ canvasId, userId });
+  }
+
+  /**
+   * Adds a single tag to a canvas
+   * @param canvasId
+   * @param dto - an object containing 'tagId'
+   */
+  @Post('/:id/tags')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async addTag(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasModifyTagDTO,
+  ) {
+    const tagId = dto.tagId;
+    await this.canvasService.addTag({ canvasId, tagId });
+  }
+
+  /**
+   * Removes a single tag from a canvas
+   * @param canvasId
+   * @param dto - an object containing 'tagId'
+   */
+  @Delete('/:id/tags')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async removeTag(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasModifyTagDTO,
+  ) {
+    const tagId = dto.tagId;
+    await this.canvasService.removeTag({ canvasId, tagId });
   }
 }
