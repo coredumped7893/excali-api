@@ -219,7 +219,7 @@ export class CanvasService {
     if (!canvas) {
       throw new NotFoundException();
     }
-    canvas.tags = canvas.tags.filter((tag) => tag.id == command.tagId);
+    canvas.tags = canvas.tags.filter((tag) => tag.id != command.tagId);
     await this.canvasRepository.save(canvas);
   }
 }
