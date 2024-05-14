@@ -80,7 +80,4 @@ export class CanvasAccessDTO {
 export class CanvasStateFilter {
   @IsOptional()
   versionTimestamp?: string;
-  @IsUUID()
-  @IsNotEmpty()
-  canvasId: Uuid;
 }

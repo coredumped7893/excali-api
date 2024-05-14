@@ -25,6 +25,7 @@ import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
 import { CanvasGuard } from './guard/canvas.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
 import { Request } from 'express';
+import { CanvasPublicGuard } from './guard/canvas.public.guard';
 
 @Controller('/canvas')
 export class CanvasController {
@@ -172,9 +173,13 @@ export class CanvasController {
       response: ['appState', 'elements', 'files'],
     },
   })
-  @Get('/state')
-  public async readState(@Query() filter: CanvasStateFilter) {
-    return this.canvasService.readState(filter);
+  @Get('/:id/state')
+  @UseGuards(CanvasPublicGuard)
+  public async readState(
+    @Param('id') id: Uuid,
+    @Query() filter: CanvasStateFilter,
+  ) {
+    return this.canvasService.readState(id, filter);
   }
 
   /**
@@ -195,7 +200,7 @@ export class CanvasController {
    * @returns {Promise<CanvasDTO>} - A Promise that resolves to the retrieved CanvasDTO object.
    */
   @Get('/:id')
-  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  @UseGuards(CanvasPublicGuard)
   public async readById(@Param('id') uuid: Uuid): Promise<CanvasDTO> {
     return await this.canvasService.readById(uuid);
   }
