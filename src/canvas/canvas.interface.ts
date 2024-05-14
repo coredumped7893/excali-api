@@ -14,6 +14,7 @@ import {
 
 export interface CanvasCreateCommand {
   name: string;
+  userId: Uuid;
 }
 
 export interface CanvasContentUpdateCommand {
@@ -26,6 +27,16 @@ export interface CanvasContentUpdateCommand {
 export interface CanvasMetadataUpdateCommand {
   id: Uuid;
   name: string;
+}
+
+export interface GiveAccessCommand {
+  canvasId: Uuid;
+  userId: Uuid;
+}
+
+export interface CancelAccessCommand {
+  canvasId: Uuid;
+  userId: Uuid;
 }
 
 export class CanvasMetadataUpdateDTO {
@@ -58,6 +69,12 @@ export interface CanvasTagDTO {
   id: Uuid;
   name: string;
   color: string;
+}
+
+export class CanvasAccessDTO {
+  @IsUUID()
+  @IsNotEmpty()
+  userId: Uuid;
 }
 
 export class CanvasStateFilter {

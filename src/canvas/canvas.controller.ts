@@ -1,15 +1,18 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
   Post,
   Query,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CanvasService } from './canvas.service';
 import {
+  CanvasAccessDTO,
   CanvasContentUpdateDto,
   CanvasCreateDTO,
   CanvasDTO,
@@ -19,7 +22,9 @@ import {
 import { Uuid } from '../common/common.interface';
 import { ListFilter } from '../common/pageable.utils';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
+import { CanvasGuard } from './guard/canvas.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
+import { Request } from 'express';
 
 @Controller('/canvas')
 export class CanvasController {
@@ -30,6 +35,7 @@ export class CanvasController {
    *
    * @param {CanvasCreateDTO} createDto - The data transfer object containing the canvas details.
    *
+   * @param req - HTTP request object
    * @returns {Promise<CanvasDTO>} - The promise of a CanvasDTO object representing the created canvas.
    *
    * Example input:
@@ -52,8 +58,10 @@ export class CanvasController {
   @UseGuards(AuthenticatedGuard)
   public async createNewCanvas(
     @Body() createDto: CanvasCreateDTO,
+    @Req() req: Request,
   ): Promise<CanvasDTO> {
-    const canvas = await this.canvasService.create(createDto);
+    const userId = req.user.toString();
+    const canvas = await this.canvasService.create({ ...createDto, userId });
     return {
       id: canvas.id,
       name: canvas.name,
@@ -87,7 +95,7 @@ export class CanvasController {
    * @returns {Promise<CanvasDTO>} - A promise that resolves to the updated canvas.
    */
   @Patch('/:id')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async updateCanvasMetadata(
     @Param('id') id: Uuid,
     @Body() updateDto: CanvasMetadataUpdateDTO,
@@ -141,7 +149,7 @@ export class CanvasController {
    * @returns A Promise that resolves to a CanvasDTO object representing the updated canvas.
    */
   @Post('/:id/state')
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async appendCanvasState(
     @Param('id') id: Uuid,
     @Body() appendStateDto: CanvasContentUpdateDto,
@@ -186,9 +194,9 @@ export class CanvasController {
    * @param {string} uuid - The UUID of the canvas to be retrieved.
    * @returns {Promise<CanvasDTO>} - A Promise that resolves to the retrieved CanvasDTO object.
    */
-  @Get('/:uuid')
-  @UseGuards(AuthenticatedGuard)
-  public async readById(@Param('uuid') uuid: Uuid): Promise<CanvasDTO> {
+  @Get('/:id')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async readById(@Param('id') uuid: Uuid): Promise<CanvasDTO> {
     return await this.canvasService.readById(uuid);
   }
 
@@ -221,11 +229,45 @@ export class CanvasController {
    * ```
    *
    * @param {ListFilter} filter - The filter to apply when retrieving items.
+   * @param req - HTTP request object
    * @return {Promise<any>} - A Promise that resolves to the retrieved items.
    */
   @Get('/')
   @UseGuards(AuthenticatedGuard)
-  public async readAll(@Query() filter: ListFilter): Promise<any> {
-    return this.canvasService.readAll(filter);
+  public async readAll(
+    @Query() filter: ListFilter,
+    @Req() req: Request,
+  ): Promise<any> {
+    return await this.canvasService.readAll(filter, req.user.toString());
+  }
+
+  /**
+   * Gives access to a single canvas for a single user
+   * @param canvasId
+   * @param dto - an object containing 'userId'
+   */
+  @Post('/:id/access')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async giveAccess(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasAccessDTO,
+  ) {
+    const userId = dto.userId;
+    await this.canvasService.giveAccess({ canvasId, userId });
+  }
+
+  /**
+   * Removes access to a single canvas for a single user
+   * @param canvasId
+   * @param dto - an object containing 'userId'
+   */
+  @Delete('/:id/access')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async cancelAccess(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasAccessDTO,
+  ) {
+    const userId = dto.userId;
+    await this.canvasService.cancelAccess({ canvasId, userId });
   }
 }
