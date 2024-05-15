@@ -13,7 +13,7 @@ import { CanvasTagService } from './canvas-tag.service';
 import { CanvasTagCreateOrUpdateDTO, CanvasTagDTO } from './canvas.interface';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
 import { Uuid } from '../common/common.interface';
-import { ListFilter } from '../common/pageable.utils';
+import {ListFilter, PagedResult} from '../common/pageable.utils';
 
 @Controller('/canvas-tag')
 export class CanvasTagController {
@@ -40,7 +40,9 @@ export class CanvasTagController {
 
   @Get('/')
   @UseGuards(AuthenticatedGuard)
-  public async readAll(@Query() filter: ListFilter): Promise<any> {
+  public async readAll(
+    @Query() filter: ListFilter,
+  ): Promise<PagedResult<CanvasTagDTO>> {
     return await this.canvasTagService.readAll(filter);
   }
 

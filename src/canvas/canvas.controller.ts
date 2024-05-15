@@ -21,7 +21,7 @@ import {
   CanvasStateFilter,
 } from './canvas.interface';
 import { Uuid } from '../common/common.interface';
-import { ListFilter } from '../common/pageable.utils';
+import {ListFilter, PagedResult} from '../common/pageable.utils';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
 import { CanvasGuard } from './guard/canvas.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
@@ -231,14 +231,14 @@ export class CanvasController {
    *
    * @param {ListFilter} filter - The filter to apply when retrieving items.
    * @param req - HTTP request object
-   * @return {Promise<any>} - A Promise that resolves to the retrieved items.
+   * @return {Promise<CanvasDTO>} - A Promise that resolves to the retrieved items.
    */
   @Get('/')
   @UseGuards(AuthenticatedGuard)
   public async readAll(
     @Query() filter: ListFilter,
     @Req() req: Request,
-  ): Promise<any> {
+  ): Promise<PagedResult<CanvasDTO>> {
     return await this.canvasService.readAll(filter, req.user.toString());
   }
 
