@@ -14,7 +14,13 @@ export class CanvasGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     const canvasId = request.params.id;
-    const userId = request.user.toString();
+    if (!canvasId) {
+      return true;
+    }
+    const userId = request.user;
+    if (!userId) {
+      return false;
+    }
 
     const canvasAccess = await this.canvasAccessRepository.findOne({
       where: { canvas: { id: canvasId }, user: { id: userId } },
