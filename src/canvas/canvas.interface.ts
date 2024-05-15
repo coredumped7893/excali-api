@@ -39,6 +39,16 @@ export interface CancelAccessCommand {
   userId: Uuid;
 }
 
+export interface CanvasAddTagCommand {
+  canvasId: Uuid;
+  tagIds: [Uuid];
+}
+
+export interface CanvasRemoveTagCommand {
+  canvasId: Uuid;
+  tagIds: [Uuid];
+}
+
 export class CanvasMetadataUpdateDTO {
   @MinLength(3)
   @MaxLength(255)
@@ -80,4 +90,36 @@ export class CanvasAccessDTO {
 export class CanvasStateFilter {
   @IsOptional()
   versionTimestamp?: string;
+}
+
+export interface CanvasTagCreateCommand {
+  name: string;
+  color?: string;
+}
+
+export interface CanvasTagUpdateCommand {
+  id: Uuid;
+  name: string;
+  color?: string;
+}
+
+export interface CanvasTagDeleteCommand {
+  id: Uuid;
+}
+
+export class CanvasTagCreateOrUpdateDTO {
+  @MinLength(3)
+  @MaxLength(12)
+  name: string;
+  @IsOptional()
+  @MinLength(7)
+  @MaxLength(7)
+  color?: string;
+}
+
+export class CanvasModifyTagDTO {
+  @IsUUID('all', { each: true })
+  @IsNotEmpty({ each: true })
+  @IsNotEmpty()
+  tagIds: [Uuid];
 }

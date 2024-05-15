@@ -17,10 +17,11 @@ import {
   CanvasCreateDTO,
   CanvasDTO,
   CanvasMetadataUpdateDTO,
+  CanvasModifyTagDTO,
   CanvasStateFilter,
 } from './canvas.interface';
 import { Uuid } from '../common/common.interface';
-import { ListFilter } from '../common/pageable.utils';
+import {ListFilter, PagedResult} from '../common/pageable.utils';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
 import { CanvasGuard } from './guard/canvas.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
@@ -235,14 +236,14 @@ export class CanvasController {
    *
    * @param {ListFilter} filter - The filter to apply when retrieving items.
    * @param req - HTTP request object
-   * @return {Promise<any>} - A Promise that resolves to the retrieved items.
+   * @return {Promise<CanvasDTO>} - A Promise that resolves to the retrieved items.
    */
   @Get('/')
   @UseGuards(AuthenticatedGuard)
   public async readAll(
     @Query() filter: ListFilter,
     @Req() req: Request,
-  ): Promise<any> {
+  ): Promise<PagedResult<CanvasDTO>> {
     return await this.canvasService.readAll(filter, req.user.toString());
   }
 
@@ -274,5 +275,35 @@ export class CanvasController {
   ) {
     const userId = dto.userId;
     await this.canvasService.cancelAccess({ canvasId, userId });
+  }
+
+  /**
+   * Adds a single tag to a canvas
+   * @param canvasId
+   * @param dto - an object containing 'tagId'
+   */
+  @Post('/:id/tags')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async addTags(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasModifyTagDTO,
+  ) {
+    const tagIds = dto.tagIds;
+    await this.canvasService.addTags({ canvasId, tagIds });
+  }
+
+  /**
+   * Removes a single tag from a canvas
+   * @param canvasId
+   * @param dto - an object containing 'tagId'
+   */
+  @Delete('/:id/tags')
+  @UseGuards(AuthenticatedGuard, CanvasGuard)
+  public async removeTags(
+    @Param('id') canvasId: Uuid,
+    @Body() dto: CanvasModifyTagDTO,
+  ) {
+    const tagIds = dto.tagIds;
+    await this.canvasService.removeTags({ canvasId, tagIds });
   }
 }
