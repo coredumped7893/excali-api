@@ -13,14 +13,17 @@ import { CanvasTagService } from './canvas-tag.service';
 import { CanvasTagCreateOrUpdateDTO, CanvasTagDTO } from './canvas.interface';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
 import { Uuid } from '../common/common.interface';
-import {ListFilter, PagedResult} from '../common/pageable.utils';
+import { ListFilter, PagedResult } from '../common/pageable.utils';
+import { Roles } from '../auth/decorator/roles.decorator';
+import { RolesGuard } from '../auth/guard/roles.guard';
 
 @Controller('/canvas-tag')
 export class CanvasTagController {
   constructor(private readonly canvasTagService: CanvasTagService) {}
 
   @Post()
-  @UseGuards(AuthenticatedGuard)
+  @Roles(['ADMIN'])
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   public async create(
     @Body() dto: CanvasTagCreateOrUpdateDTO,
   ): Promise<CanvasTagDTO> {
@@ -47,7 +50,8 @@ export class CanvasTagController {
   }
 
   @Put('/:id')
-  @UseGuards(AuthenticatedGuard)
+  @Roles(['ADMIN'])
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   public async update(
     @Param('id') id: Uuid,
     @Body() dto: CanvasTagCreateOrUpdateDTO,
@@ -59,7 +63,8 @@ export class CanvasTagController {
   }
 
   @Delete('/:id')
-  @UseGuards(AuthenticatedGuard)
+  @Roles(['ADMIN'])
+  @UseGuards(AuthenticatedGuard, RolesGuard)
   public async delete(@Param('id') id: Uuid) {
     await this.canvasTagService.delete({ id });
   }
