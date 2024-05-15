@@ -41,12 +41,12 @@ export interface CancelAccessCommand {
 
 export interface CanvasAddTagCommand {
   canvasId: Uuid;
-  tagId: Uuid;
+  tagIds: [Uuid];
 }
 
 export interface CanvasRemoveTagCommand {
   canvasId: Uuid;
-  tagId: Uuid;
+  tagIds: [Uuid];
 }
 
 export class CanvasMetadataUpdateDTO {
@@ -121,7 +121,8 @@ export class CanvasTagCreateOrUpdateDTO {
 }
 
 export class CanvasModifyTagDTO {
-  @IsUUID()
+  @IsUUID('all', { each: true })
+  @IsNotEmpty({ each: true })
   @IsNotEmpty()
-  tagId: Uuid;
+  tagIds: [Uuid];
 }

@@ -279,12 +279,12 @@ export class CanvasController {
    */
   @Post('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
-  public async addTag(
+  public async addTags(
     @Param('id') canvasId: Uuid,
     @Body() dto: CanvasModifyTagDTO,
   ) {
-    const tagId = dto.tagId;
-    await this.canvasService.addTag({ canvasId, tagId });
+    const tagIds = dto.tagIds;
+    await this.canvasService.addTags({ canvasId, tagIds });
   }
 
   /**
@@ -294,11 +294,11 @@ export class CanvasController {
    */
   @Delete('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
-  public async removeTag(
+  public async removeTags(
     @Param('id') canvasId: Uuid,
     @Body() dto: CanvasModifyTagDTO,
   ) {
-    const tagId = dto.tagId;
-    await this.canvasService.removeTag({ canvasId, tagId });
+    const tagIds = dto.tagIds;
+    await this.canvasService.removeTags({ canvasId, tagIds });
   }
 }

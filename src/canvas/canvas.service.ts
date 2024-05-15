@@ -193,25 +193,7 @@ export class CanvasService {
     });
   }
 
-  public async addTag(command: CanvasAddTagCommand) {
-    const tag = await this.canvasTagRepository.findOne({
-      where: { id: command.tagId },
-    });
-    const canvas = await this.canvasRepository.findOne({
-      where: { id: command.canvasId },
-      relations: { tags: true },
-    });
-    if (!tag || !canvas) {
-      throw new NotFoundException();
-    }
-    if (canvas.tags.includes(tag)) {
-      return;
-    }
-    canvas.tags.push(tag);
-    await this.canvasRepository.save(canvas);
-  }
-
-  public async removeTag(command: CanvasRemoveTagCommand) {
+  public async addTags(command: CanvasAddTagCommand) {
     const canvas = await this.canvasRepository.findOne({
       where: { id: command.canvasId },
       relations: { tags: true },
@@ -219,7 +201,32 @@ export class CanvasService {
     if (!canvas) {
       throw new NotFoundException();
     }
-    canvas.tags = canvas.tags.filter((tag) => tag.id != command.tagId);
+    command.tagIds.forEach((tagId) => this.addTag(canvas, tagId));
     await this.canvasRepository.save(canvas);
+  }
+
+  public async removeTags(command: CanvasRemoveTagCommand) {
+    const canvas = await this.canvasRepository.findOne({
+      where: { id: command.canvasId },
+      relations: { tags: true },
+    });
+    if (!canvas) {
+      throw new NotFoundException();
+    }
+    canvas.tags = canvas.tags.filter((tag) => !command.tagIds.includes(tag.id));
+    await this.canvasRepository.save(canvas);
+  }
+
+  private async addTag(canvas: CanvasEntity, tagId: Uuid) {
+    const tag = await this.canvasTagRepository.findOne({
+      where: { id: tagId },
+    });
+    if (!tag) {
+      throw new NotFoundException();
+    }
+    if (canvas.tags.includes(tag)) {
+      return;
+    }
+    canvas.tags.push(tag);
   }
 }
