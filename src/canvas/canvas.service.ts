@@ -10,6 +10,7 @@ import {
   CanvasMetadataUpdateCommand,
   CanvasRemoveTagCommand,
   CanvasStateFilter,
+  GiveAccessByTagCommand,
   GiveAccessCommand,
 } from './canvas.interface';
 import { CanvasStateEntity } from './entity/canvas-state.entity';
@@ -109,18 +110,7 @@ export class CanvasService {
     filter: ListFilter,
     userId: Uuid,
   ): Promise<PagedResult<CanvasEntity>> {
-    const accessibleCanvases = (
-      await this.canvasAccessRepository.find({
-        relations: {
-          canvas: true,
-        },
-        where: {
-          user: {
-            id: userId,
-          },
-        },
-      })
-    ).map((access) => access.canvas.id);
+    const accessibleCanvases = await this.getAccessibleCanvases(userId);
 
     const qb = PageableUtils.producePagedQueryBuilder(
       filter,
@@ -133,6 +123,18 @@ export class CanvasService {
       filter,
       await qb.leftJoinAndSelect('canvas.tags', 'tags').getManyAndCount(),
     );
+  }
+
+  public async readByTags(
+    tagIds: Uuid[],
+    userId: Uuid,
+  ): Promise<CanvasEntity[]> {
+    const accessibleCanvases = await this.getAccessibleCanvases(userId);
+    const qb = this.canvasRepository.createQueryBuilder('canvas');
+    qb.innerJoin('canvas.tags', 'tags');
+    qb.whereInIds(accessibleCanvases);
+    qb.andWhere('tags.id in (:...tagIds)', { tagIds: tagIds });
+    return await qb.select().getMany();
   }
 
   private produceEmptyCanvasState(canvasId?: Uuid): Partial<CanvasStateEntity> {
@@ -194,6 +196,24 @@ export class CanvasService {
     });
   }
 
+  public async giveAccessByTag(command: GiveAccessByTagCommand) {
+    const user = await this.userRepository.findOne({
+      where: { id: command.userId },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    const accessibleWithTags = await this.readByTags(command.tagIds, user.id);
+    accessibleWithTags.forEach((canvas) =>
+      command.personIds.forEach((personId) =>
+        this.giveAccess({
+          canvasId: canvas.id,
+          userId: personId,
+        }),
+      ),
+    );
+  }
+
   public async addTags(command: CanvasAddTagCommand) {
     const canvas = await this.canvasRepository.findOne({
       where: { id: command.canvasId },
@@ -229,5 +249,20 @@ export class CanvasService {
       return;
     }
     canvas.tags.push(tag);
+  }
+
+  private async getAccessibleCanvases(userId: Uuid): Promise<Uuid[]> {
+    return (
+      await this.canvasAccessRepository.find({
+        relations: {
+          canvas: true,
+        },
+        where: {
+          user: {
+            id: userId,
+          },
+        },
+      })
+    ).map((access) => access.canvas.id);
   }
 }
