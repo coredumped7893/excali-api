@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { CanvasService } from './canvas.service';
 import {
+  CanvasAccessByTagDTO,
   CanvasAccessDTO,
   CanvasContentUpdateDto,
   CanvasCreateDTO,
@@ -21,7 +22,7 @@ import {
   CanvasStateFilter,
 } from './canvas.interface';
 import { Uuid } from '../common/common.interface';
-import {ListFilter, PagedResult} from '../common/pageable.utils';
+import { ListFilter, PagedResult } from '../common/pageable.utils';
 import { AuthenticatedGuard } from '../auth/guard/authenticated.guard';
 import { CanvasGuard } from './guard/canvas.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
@@ -275,6 +276,18 @@ export class CanvasController {
   ) {
     const userId = dto.userId;
     await this.canvasService.cancelAccess({ canvasId, userId });
+  }
+
+  @Post('/access')
+  @UseGuards(AuthenticatedGuard)
+  public async giveAccessByTag(
+    @Body() dto: CanvasAccessByTagDTO,
+    @Req() req: Request,
+  ) {
+    await this.canvasService.giveAccessByTag({
+      userId: req.user.toString(),
+      ...dto,
+    });
   }
 
   /**

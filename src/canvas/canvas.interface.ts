@@ -39,6 +39,12 @@ export interface CancelAccessCommand {
   userId: Uuid;
 }
 
+export interface GiveAccessByTagCommand {
+  userId: Uuid;
+  tagIds: Uuid[];
+  personIds: Uuid[];
+}
+
 export interface CanvasAddTagCommand {
   canvasId: Uuid;
   tagIds: Uuid[];
@@ -85,6 +91,17 @@ export class CanvasAccessDTO {
   @IsUUID()
   @IsNotEmpty()
   userId: Uuid;
+}
+
+export class CanvasAccessByTagDTO {
+  @IsUUID('all', { each: true })
+  @IsNotEmpty({ each: true })
+  @IsNotEmpty()
+  tagIds: Uuid[];
+  @IsUUID('all', { each: true })
+  @IsNotEmpty({ each: true })
+  @IsNotEmpty()
+  personIds: Uuid[];
 }
 
 export class CanvasStateFilter {
