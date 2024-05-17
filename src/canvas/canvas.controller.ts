@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { CanvasService } from './canvas.service';
 import {
-  CanvasAccessByTagDTO,
+  GiveCanvasAccessByTagDTO,
   CanvasAccessDTO,
   CanvasContentUpdateDto,
   CanvasCreateDTO,
@@ -20,6 +20,7 @@ import {
   CanvasMetadataUpdateDTO,
   CanvasModifyTagDTO,
   CanvasStateFilter,
+  CancelCanvasAccessByTagDTO,
 } from './canvas.interface';
 import { Uuid } from '../common/common.interface';
 import { ListFilter, PagedResult } from '../common/pageable.utils';
@@ -251,7 +252,7 @@ export class CanvasController {
   /**
    * Gives access to a single canvas for a single user
    * @param canvasId
-   * @param dto - an object containing 'userId'
+   * @param dto - an object containing 'personId'
    */
   @Post('/:id/access')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
@@ -259,29 +260,38 @@ export class CanvasController {
     @Param('id') canvasId: Uuid,
     @Body() dto: CanvasAccessDTO,
   ) {
-    const userId = dto.userId;
-    await this.canvasService.giveAccess({ canvasId, userId });
+    await this.canvasService.giveAccess({ canvasId, ...dto });
   }
 
   /**
    * Removes access to a single canvas for a single user
    * @param canvasId
-   * @param dto - an object containing 'userId'
+   * @param dto - an object containing 'personId'
+   * @param req - HTTP request object
    */
   @Delete('/:id/access')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async cancelAccess(
     @Param('id') canvasId: Uuid,
     @Body() dto: CanvasAccessDTO,
+    @Req() req: Request,
   ) {
-    const userId = dto.userId;
-    await this.canvasService.cancelAccess({ canvasId, userId });
+    await this.canvasService.cancelAccess({
+      userId: req.user.toString(),
+      canvasId,
+      ...dto,
+    });
   }
 
+  /**
+   * Gives access to canvases with tags from the given list for selected users
+   * @param dto - an object containing 'tagIds' & 'personIds'
+   * @param req - HTTP request object
+   */
   @Post('/access')
   @UseGuards(AuthenticatedGuard)
   public async giveAccessByTag(
-    @Body() dto: CanvasAccessByTagDTO,
+    @Body() dto: GiveCanvasAccessByTagDTO,
     @Req() req: Request,
   ) {
     await this.canvasService.giveAccessByTag({
@@ -291,9 +301,26 @@ export class CanvasController {
   }
 
   /**
-   * Adds a single tag to a canvas
+   * Removes access to canvases with tags from the given list
+   * @param dto - an object containing 'tagIds'
+   * @param req - HTTP request object
+   */
+  @Delete('/access')
+  @UseGuards(AuthenticatedGuard)
+  public async cancelAccessByTag(
+    @Body() dto: CancelCanvasAccessByTagDTO,
+    @Req() req: Request,
+  ) {
+    await this.canvasService.cancelAccessByTag({
+      userId: req.user.toString(),
+      ...dto,
+    });
+  }
+
+  /**
+   * Adds tags to a canvas
    * @param canvasId
-   * @param dto - an object containing 'tagId'
+   * @param dto - an object containing 'tagIds'
    */
   @Post('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
@@ -306,9 +333,9 @@ export class CanvasController {
   }
 
   /**
-   * Removes a single tag from a canvas
+   * Removes tags from a canvas
    * @param canvasId
-   * @param dto - an object containing 'tagId'
+   * @param dto - an object containing 'tagIds'
    */
   @Delete('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)

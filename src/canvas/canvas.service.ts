@@ -3,6 +3,7 @@ import { Repository } from 'typeorm';
 import { CanvasEntity } from './entity/canvas.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
+  CancelAccessByTagCommand,
   CancelAccessCommand,
   CanvasAddTagCommand,
   CanvasContentUpdateCommand,
@@ -168,7 +169,7 @@ export class CanvasService {
 
   public async giveAccess(command: GiveAccessCommand) {
     const user = await this.userRepository.findOne({
-      where: { id: command.userId },
+      where: { id: command.personId },
     });
     const canvas = await this.canvasRepository.findOne({
       where: { id: command.canvasId },
@@ -177,7 +178,10 @@ export class CanvasService {
       throw new NotFoundException();
     }
     let canvasAccess = await this.canvasAccessRepository.findOne({
-      where: { user: { id: command.userId }, canvas: { id: command.canvasId } },
+      where: {
+        user: { id: command.personId },
+        canvas: { id: command.canvasId },
+      },
     });
     if (canvasAccess) {
       return;
@@ -190,10 +194,20 @@ export class CanvasService {
   }
 
   public async cancelAccess(command: CancelAccessCommand) {
-    await this.canvasAccessRepository.delete({
-      user: { id: command.userId },
-      canvas: { id: command.canvasId },
-    });
+    let criteria: any;
+    if (command.userId == command.personId) {
+      criteria = {
+        user: { id: command.personId },
+        canvas: { id: command.canvasId },
+      };
+    } else {
+      criteria = {
+        user: { id: command.personId },
+        canvas: { id: command.canvasId },
+        isOwner: false,
+      };
+    }
+    await this.canvasAccessRepository.delete(criteria);
   }
 
   public async giveAccessByTag(command: GiveAccessByTagCommand) {
@@ -208,10 +222,37 @@ export class CanvasService {
       command.personIds.forEach((personId) =>
         this.giveAccess({
           canvasId: canvas.id,
-          userId: personId,
+          personId: personId,
         }),
       ),
     );
+  }
+
+  public async cancelAccessByTag(command: CancelAccessByTagCommand) {
+    const user = await this.userRepository.findOne({
+      where: { id: command.userId },
+    });
+    if (!user) {
+      throw new NotFoundException();
+    }
+    const accessibleWithTags = await this.readByTags(command.tagIds, user.id);
+    for (const canvas of accessibleWithTags) {
+      const accessList = await this.canvasAccessRepository.find({
+        where: {
+          canvas: { id: canvas.id },
+        },
+        relations: { user: true },
+      });
+      accessList.forEach((access) => {
+        if (access.user.id != user.id) {
+          this.cancelAccess({
+            userId: user.id,
+            canvasId: canvas.id,
+            personId: access.user.id,
+          });
+        }
+      });
+    }
   }
 
   public async addTags(command: CanvasAddTagCommand) {
