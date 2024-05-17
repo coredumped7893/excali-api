@@ -14,7 +14,7 @@ import { CanvasService } from './canvas.service';
 import {
   GiveCanvasAccessByTagDTO,
   CanvasAccessDTO,
-  CanvasContentUpdateDto,
+  CanvasContentUpdateDTO,
   CanvasCreateDTO,
   CanvasDTO,
   CanvasMetadataUpdateDTO,
@@ -29,6 +29,7 @@ import { CanvasGuard } from './guard/canvas.guard';
 import { Log } from '@algoan/nestjs-logging-interceptor';
 import { Request } from 'express';
 import { CanvasPublicGuard } from './guard/canvas.public.guard';
+import { CanvasStateEntity } from './entity/canvas-state.entity';
 
 @Controller('/canvas')
 export class CanvasController {
@@ -156,7 +157,7 @@ export class CanvasController {
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async appendCanvasState(
     @Param('id') id: Uuid,
-    @Body() appendStateDto: CanvasContentUpdateDto,
+    @Body() appendStateDto: CanvasContentUpdateDTO,
   ): Promise<CanvasDTO> {
     const canvas = await this.canvasService.updateCanvasContent({
       ...appendStateDto,
@@ -183,6 +184,20 @@ export class CanvasController {
     @Query() filter: CanvasStateFilter,
   ) {
     return this.canvasService.readState(id, filter);
+  }
+
+  /**
+   * Retrieves history of state changes for the given canvas
+   * @param id - canvas id
+   * @param filter - paging & sorting parameters
+   */
+  @Get('/:id/state-change')
+  @UseGuards(CanvasPublicGuard)
+  public async readStateChanges(
+    @Param('id') id: Uuid,
+    @Query() filter: ListFilter,
+  ): Promise<PagedResult<CanvasStateEntity>> {
+    return this.canvasService.readAllStates(id, filter);
   }
 
   /**

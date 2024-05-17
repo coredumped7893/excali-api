@@ -157,13 +157,28 @@ export class CanvasService {
     queryBuilder.andWhere({ canvasId });
 
     //If no timestamp value in filter is provided, return latest version
-    if (filter.versionTimestamp) {
-      queryBuilder.andWhere({ dateCreated: filter.versionTimestamp });
+    if (filter.versionId) {
+      queryBuilder.andWhere({ id: filter.versionId });
     }
 
     return (
       (await queryBuilder.getOne()) ||
       (this.produceEmptyCanvasState(canvasId) as CanvasStateEntity) //If state is empty return default one
+    );
+  }
+
+  public async readAllStates(
+    canvasId: Uuid,
+    filter: ListFilter,
+  ): Promise<PagedResult<CanvasStateEntity>> {
+    const qb = PageableUtils.producePagedQueryBuilder(
+      filter,
+      this.canvasStateRepository.createQueryBuilder('state'),
+    );
+    qb.where({ canvasId });
+    return PageableUtils.producePagedResult(
+      filter,
+      await qb.select().getManyAndCount(),
     );
   }
 

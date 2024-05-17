@@ -11,6 +11,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export interface CanvasCreateCommand {
   name: string;
@@ -73,7 +74,7 @@ export class CanvasCreateDTO {
   name: string;
 }
 
-export interface CanvasContentUpdateDto {
+export class CanvasContentUpdateDTO {
   appState: CanvasAppState;
   elements: CanvasElements;
   files: CanvasFiles;
@@ -118,8 +119,10 @@ export class CancelCanvasAccessByTagDTO {
 }
 
 export class CanvasStateFilter {
+  @ApiProperty({ required: false })
   @IsOptional()
-  versionTimestamp?: string;
+  @IsUUID()
+  versionId?: Uuid;
 }
 
 export interface CanvasTagCreateCommand {
