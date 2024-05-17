@@ -284,7 +284,7 @@ export class CanvasController {
   }
 
   /**
-   * Give access to canvases with a given tag for selected users
+   * Gives access to canvases with tags from the given list for selected users
    * @param dto - an object containing 'tagIds' & 'personIds'
    * @param req - HTTP request object
    */
@@ -301,7 +301,7 @@ export class CanvasController {
   }
 
   /**
-   * Cancel access to canvases with a given tag for selected users
+   * Removes access to canvases with tags from the given list
    * @param dto - an object containing 'tagIds'
    * @param req - HTTP request object
    */
@@ -318,9 +318,9 @@ export class CanvasController {
   }
 
   /**
-   * Adds a single tag to a canvas
+   * Adds tags to a canvas
    * @param canvasId
-   * @param dto - an object containing 'tagId'
+   * @param dto - an object containing 'tagIds'
    */
   @Post('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
@@ -333,9 +333,9 @@ export class CanvasController {
   }
 
   /**
-   * Removes a single tag from a canvas
+   * Removes tags from a canvas
    * @param canvasId
-   * @param dto - an object containing 'tagId'
+   * @param dto - an object containing 'tagIds'
    */
   @Delete('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
