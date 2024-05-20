@@ -176,10 +176,7 @@ export class CanvasService {
       this.canvasStateRepository.createQueryBuilder('state'),
     );
     qb.where({ canvasId });
-    return PageableUtils.producePagedResult(
-      filter,
-      await qb.select().getManyAndCount(),
-    );
+    return PageableUtils.producePagedResult(filter, await qb.getManyAndCount());
   }
 
   public async giveAccess(command: GiveAccessCommand) {
