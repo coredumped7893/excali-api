@@ -10,11 +10,14 @@ export class UserController {
 
   @Get('me')
   @UseGuards(AuthenticatedGuard)
-  public getUserMe(@Req() req: Request): UserMeDTO {
+  public async getUserMe(@Req() req: Request): Promise<UserMeDTO> {
     console.log('req', req.sessionStore);
+
+    const user = await this.userService.readById(req.user.toString());
+
     return {
-      uid: req.user.toString(),
-      email: '', //@TODO read from db
+      uid: user.id,
+      roles: user.roles,
     };
   }
 }
