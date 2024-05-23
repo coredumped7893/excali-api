@@ -127,6 +127,7 @@ export class CanvasStateFilter {
 
 export interface CanvasTagCreateCommand {
   name: string;
+  description?: string;
   color?: string;
 }
 
@@ -148,6 +149,9 @@ export class CanvasTagCreateOrUpdateDTO {
   @MinLength(7)
   @MaxLength(7)
   color?: string;
+  @IsOptional()
+  @MaxLength(1024)
+  description?: string;
 }
 
 export class CanvasModifyTagDTO {

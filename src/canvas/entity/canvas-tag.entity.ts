@@ -13,4 +13,6 @@ export class CanvasTagEntity {
     length: 7,
   })
   color: string;
+  @Column({ length: 1024, nullable: true })
+  description: string;
 }

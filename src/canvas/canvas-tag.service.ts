@@ -33,6 +33,7 @@ export class CanvasTagService {
     }
     const tag = new CanvasTagEntity();
     tag.name = tagName;
+    tag.name = command.description?.trim();
     tag.color = command.color;
     await this.canvasTagRepository.save(tag);
     return tag;
