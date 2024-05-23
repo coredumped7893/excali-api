@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
 
 @Entity('canvas_tag')
+@Unique(['name'])
 export class CanvasTagEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;

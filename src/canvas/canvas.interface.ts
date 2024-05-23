@@ -75,6 +75,7 @@ export class CanvasCreateDTO {
 }
 
 export class CanvasContentUpdateDTO {
+  @IsNotEmpty()
   appState: CanvasAppState;
   elements: CanvasElements;
   files: CanvasFiles;

@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { CanvasAccessEntity } from '../entity/canvas-access.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { validate as uuidValidate } from 'uuid';
 
 @Injectable()
 export class CanvasGuard implements CanActivate {
@@ -14,7 +15,7 @@ export class CanvasGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
 
     const canvasId = request.params.id;
-    if (!canvasId) {
+    if (!canvasId || !uuidValidate(canvasId)) {
       return true;
     }
     const userId = request.user;
