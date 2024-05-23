@@ -206,19 +206,15 @@ export class CanvasService {
   }
 
   public async cancelAccess(command: CancelAccessCommand) {
-    let criteria: any;
-    if (command.userId == command.personId) {
-      criteria = {
-        user: { id: command.personId },
-        canvas: { id: command.canvasId },
-      };
-    } else {
-      criteria = {
-        user: { id: command.personId },
-        canvas: { id: command.canvasId },
-        isOwner: false,
-      };
+    const criteria = {
+      user: { id: command.personId },
+      canvas: { id: command.canvasId },
+    } as CanvasAccessEntity;
+
+    if (command.userId !== command.personId) {
+      criteria.isOwner = false;
     }
+
     await this.canvasAccessRepository.delete(criteria);
   }
 

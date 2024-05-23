@@ -30,6 +30,7 @@ import { Log } from '@algoan/nestjs-logging-interceptor';
 import { Request } from 'express';
 import { CanvasPublicGuard } from './guard/canvas.public.guard';
 import { CanvasStateEntity } from './entity/canvas-state.entity';
+import { UuidPipe } from '../common/uuid.pipe';
 
 @Controller('/canvas')
 export class CanvasController {
@@ -102,7 +103,7 @@ export class CanvasController {
   @Patch('/:id')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async updateCanvasMetadata(
-    @Param('id') id: Uuid,
+    @Param('id', UuidPipe) id: Uuid,
     @Body() updateDto: CanvasMetadataUpdateDTO,
   ): Promise<CanvasDTO> {
     const canvas = await this.canvasService.updateCanvasMetadata({
@@ -156,7 +157,7 @@ export class CanvasController {
   @Post('/:id/state')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async appendCanvasState(
-    @Param('id') id: Uuid,
+    @Param('id', UuidPipe) id: Uuid,
     @Body() appendStateDto: CanvasContentUpdateDTO,
   ): Promise<CanvasDTO> {
     const canvas = await this.canvasService.updateCanvasContent({
@@ -180,7 +181,7 @@ export class CanvasController {
   @Get('/:id/state')
   @UseGuards(CanvasPublicGuard)
   public async readState(
-    @Param('id') id: Uuid,
+    @Param('id', UuidPipe) id: Uuid,
     @Query() filter: CanvasStateFilter,
   ) {
     return this.canvasService.readState(id, filter);
@@ -194,7 +195,7 @@ export class CanvasController {
   @Get('/:id/state-change')
   @UseGuards(CanvasPublicGuard)
   public async readStateChanges(
-    @Param('id') id: Uuid,
+    @Param('id', UuidPipe) id: Uuid,
     @Query() filter: ListFilter,
   ): Promise<PagedResult<CanvasStateEntity>> {
     return this.canvasService.readAllStates(id, filter);
@@ -219,7 +220,7 @@ export class CanvasController {
    */
   @Get('/:id')
   @UseGuards(CanvasPublicGuard)
-  public async readById(@Param('id') uuid: Uuid): Promise<CanvasDTO> {
+  public async readById(@Param('id', UuidPipe) uuid: Uuid): Promise<CanvasDTO> {
     return await this.canvasService.readById(uuid);
   }
 
@@ -272,7 +273,7 @@ export class CanvasController {
   @Post('/:id/access')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async giveAccess(
-    @Param('id') canvasId: Uuid,
+    @Param('id', UuidPipe) canvasId: Uuid,
     @Body() dto: CanvasAccessDTO,
   ) {
     await this.canvasService.giveAccess({ canvasId, ...dto });
@@ -287,7 +288,7 @@ export class CanvasController {
   @Delete('/:id/access')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async cancelAccess(
-    @Param('id') canvasId: Uuid,
+    @Param('id', UuidPipe) canvasId: Uuid,
     @Body() dto: CanvasAccessDTO,
     @Req() req: Request,
   ) {
@@ -340,7 +341,7 @@ export class CanvasController {
   @Post('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async addTags(
-    @Param('id') canvasId: Uuid,
+    @Param('id', UuidPipe) canvasId: Uuid,
     @Body() dto: CanvasModifyTagDTO,
   ) {
     const tagIds = dto.tagIds;
@@ -355,7 +356,7 @@ export class CanvasController {
   @Delete('/:id/tags')
   @UseGuards(AuthenticatedGuard, CanvasGuard)
   public async removeTags(
-    @Param('id') canvasId: Uuid,
+    @Param('id', UuidPipe) canvasId: Uuid,
     @Body() dto: CanvasModifyTagDTO,
   ) {
     const tagIds = dto.tagIds;
