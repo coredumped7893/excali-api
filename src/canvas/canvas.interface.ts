@@ -92,6 +92,7 @@ export interface CanvasDTO {
 export interface CanvasTagDTO {
   id: Uuid;
   name: string;
+  description: string;
   color: string;
 }
 
@@ -135,6 +136,7 @@ export interface CanvasTagCreateCommand {
 export interface CanvasTagUpdateCommand {
   id: Uuid;
   name: string;
+  description?: string;
   color?: string;
 }
 

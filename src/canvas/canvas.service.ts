@@ -48,7 +48,7 @@ export class CanvasService {
       where: { id: command.userId },
     });
     const canvas = new CanvasEntity();
-    canvas.name = command.name;
+    canvas.name = command.name.trim();
     await this.canvasRepository.save(canvas);
     const canvasAccess = new CanvasAccessEntity();
     canvasAccess.isOwner = true;
@@ -78,6 +78,9 @@ export class CanvasService {
 
     await this.canvasStateRepository.save(canvasState);
 
+    canvas.dateUpdated = new Date();
+    await this.canvasRepository.save(canvas);
+
     return canvas;
   }
 
@@ -90,7 +93,8 @@ export class CanvasService {
       throw new NotFoundException();
     }
 
-    canvas.name = command.name;
+    canvas.name = command.name.trim();
+    canvas.dateUpdated = new Date();
     await this.canvasRepository.save(canvas);
 
     return canvas;

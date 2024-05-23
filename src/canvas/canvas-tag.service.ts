@@ -33,8 +33,8 @@ export class CanvasTagService {
     }
     const tag = new CanvasTagEntity();
     tag.name = tagName;
-    tag.name = command.description?.trim();
-    tag.color = command.color;
+    tag.description = command.description?.trim();
+    tag.color = command.color?.trim();
     await this.canvasTagRepository.save(tag);
     return tag;
   }
@@ -70,7 +70,8 @@ export class CanvasTagService {
       throw new ConflictException();
     }
     tagToBeUpdated.name = tagName;
-    tagToBeUpdated.color = command.color;
+    tagToBeUpdated.description = command.description?.trim();
+    tagToBeUpdated.color = command.color?.trim();
     await this.canvasTagRepository.save(tagToBeUpdated);
     return tagToBeUpdated;
   }
