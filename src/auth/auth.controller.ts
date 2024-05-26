@@ -1,8 +1,9 @@
-import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GoogleGuard } from './guard/google.guard';
 import { Request, Response } from 'express';
 import { User } from '../user/user.interface';
+import * as process from 'node:process';
 
 @Controller('auth')
 export class AuthController {
@@ -26,5 +27,10 @@ export class AuthController {
     } else {
       return { message: 'Not Authenticated' };
     }
+  }
+
+  @Delete('logout')
+  public logout(@Req() req: Request) {
+    req.logout({ keepSessionInfo: false }, () => {});
   }
 }
