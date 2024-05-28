@@ -8,6 +8,7 @@ import {
   CanvasAddTagCommand,
   CanvasContentUpdateCommand,
   CanvasCreateCommand,
+  CanvasFilter,
   CanvasMetadataUpdateCommand,
   CanvasRemoveTagCommand,
   CanvasStateFilter,
@@ -108,21 +109,30 @@ export class CanvasService {
   }
 
   public async readAll(
-    filter: ListFilter,
+    canvasFilter: CanvasFilter,
     userId: Uuid,
   ): Promise<PagedResult<CanvasEntity>> {
-    const accessibleCanvases = await this.getAccessibleCanvases(userId);
-
-    const qb = PageableUtils.producePagedQueryBuilder(
-      filter,
+    const queryBuilder = PageableUtils.producePagedQueryBuilder(
+      canvasFilter,
       this.canvasRepository.createQueryBuilder('canvas'),
     );
 
-    qb.whereInIds(accessibleCanvases);
+    queryBuilder
+      .innerJoin('canvas.canvasAccesses', 'access')
+      .where('access.userId = :userId', { userId: userId });
+
+    canvasFilter.tagIds.forEach((tagId, index) => {
+      queryBuilder
+        .innerJoin('canvas.tags', `tag${index}`)
+        .andWhere(`tag${index}.id = :tagId${index}`)
+        .setParameter(`tagId${index}`, tagId);
+    });
 
     return PageableUtils.producePagedResult(
-      filter,
-      await qb.leftJoinAndSelect('canvas.tags', 'tags').getManyAndCount(),
+      canvasFilter,
+      await queryBuilder
+        .leftJoinAndSelect('canvas.tags', 'tags')
+        .getManyAndCount(),
     );
   }
 
@@ -138,7 +148,9 @@ export class CanvasService {
     return await qb.select().getMany();
   }
 
-  private produceEmptyCanvasState(canvasId?: Uuid): Partial<CanvasStateEntity> {
+  private static produceEmptyCanvasState(
+    canvasId?: Uuid,
+  ): Partial<CanvasStateEntity> {
     return {
       canvasId,
       appState: {},

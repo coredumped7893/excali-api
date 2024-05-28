@@ -12,6 +12,8 @@ import {
   MinLength,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { ListFilter } from '../common/pageable.utils';
+import { Transform } from 'class-transformer';
 
 export interface CanvasCreateCommand {
   name: string;
@@ -117,6 +119,14 @@ export class CancelCanvasAccessByTagDTO {
   @IsNotEmpty({ each: true })
   @IsNotEmpty()
   tagIds: Uuid[];
+}
+
+export class CanvasFilter extends ListFilter {
+  @ApiProperty({ isArray: true, type: [String], required: false })
+  @IsUUID('all', { each: true })
+  @IsOptional()
+  @Transform(({ value }) => (Array.isArray(value) ? value : Array(value)))
+  tagIds?: Uuid[] = [];
 }
 
 export class CanvasStateFilter {

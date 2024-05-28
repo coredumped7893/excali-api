@@ -43,11 +43,9 @@ function pageNumberToOffset(filter: ListFilter): number {
 export class PageableUtils {
   public static producePagedQueryBuilder<ENTITY>(
     filter: ListFilter,
-    qb: SelectQueryBuilder<ENTITY>,
+    queryBuilder: SelectQueryBuilder<ENTITY>,
   ): SelectQueryBuilder<ENTITY> {
-    const queryBuilder = qb
-      .take(filter.pageSize)
-      .offset(pageNumberToOffset(filter));
+    queryBuilder.take(filter.pageSize).offset(pageNumberToOffset(filter));
 
     if (filter.orderBy) {
       queryBuilder.addOrderBy(filter.orderBy, filter.sortOrder);

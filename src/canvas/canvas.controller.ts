@@ -21,6 +21,7 @@ import {
   CanvasModifyTagDTO,
   CanvasStateFilter,
   CancelCanvasAccessByTagDTO,
+  CanvasFilter,
 } from './canvas.interface';
 import { Uuid } from '../common/common.interface';
 import { ListFilter, PagedResult } from '../common/pageable.utils';
@@ -252,17 +253,17 @@ export class CanvasController {
    * }
    * ```
    *
-   * @param {ListFilter} filter - The filter to apply when retrieving items.
+   * @param {ListFilter} canvasFilter - The filter to apply when retrieving items.
    * @param req - HTTP request object
    * @return {Promise<CanvasDTO>} - A Promise that resolves to the retrieved items.
    */
   @Get('/')
   @UseGuards(AuthenticatedGuard)
   public async readAll(
-    @Query() filter: ListFilter,
+    @Query() canvasFilter: CanvasFilter,
     @Req() req: Request,
   ): Promise<PagedResult<CanvasDTO>> {
-    return await this.canvasService.readAll(filter, req.user.toString());
+    return await this.canvasService.readAll(canvasFilter, req.user.toString());
   }
 
   /**
