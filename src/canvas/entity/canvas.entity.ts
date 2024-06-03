@@ -3,9 +3,11 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { CanvasTagEntity } from './canvas-tag.entity';
+import { CanvasAccessEntity } from './canvas-access.entity';
 
 @Entity('canvas')
 export class CanvasEntity {
@@ -26,4 +28,7 @@ export class CanvasEntity {
     name: 'canvas_tags',
   })
   tags: CanvasTagEntity[];
+
+  @OneToMany(() => CanvasAccessEntity, (canvasAccess) => canvasAccess.canvas)
+  canvasAccesses: CanvasAccessEntity[];
 }
