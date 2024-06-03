@@ -179,7 +179,7 @@ export class CanvasService {
 
     return (
       (await queryBuilder.getOne()) ||
-      (this.produceEmptyCanvasState(canvasId) as CanvasStateEntity) //If state is empty return default one
+      (CanvasService.produceEmptyCanvasState(canvasId) as CanvasStateEntity) //If state is empty return default one
     );
   }
 
