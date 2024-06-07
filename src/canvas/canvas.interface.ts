@@ -128,6 +128,8 @@ export class CanvasFilter extends ListFilter {
   @IsOptional()
   @Transform(({ value }) => (Array.isArray(value) ? value : Array(value)))
   tagIds?: Uuid[] = [];
+  @ApiProperty({ required: false })
+  searchName?: string;
 }
 
 export class CanvasStateFilter {
