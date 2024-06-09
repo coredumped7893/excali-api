@@ -132,6 +132,12 @@ export class CanvasService {
         .setParameter(`tagId${index}`, tagId);
     });
 
+    if (canvasFilter.searchName) {
+      queryBuilder.andWhere('LOWER(canvas.name) like :searchName', {
+        searchName: `%${canvasFilter.searchName.toLowerCase()}%`,
+      });
+    }
+
     return PageableUtils.producePagedResult(
       canvasFilter,
       await queryBuilder
